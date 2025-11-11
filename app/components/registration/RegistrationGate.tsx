@@ -132,7 +132,6 @@ function unformatPhoneNumber(value: string): string {
 }
 
 function RegistrationForm({
-  code,
   isSubmitting,
   submitError,
   onSubmit,

@@ -37,8 +37,10 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
   // Get share data from backend response
   // Use rawRefCode as source of truth for registration, fallback to result.code only if no URL code
-  const registrationCode = rawRefCode || result?.code || "eef4cb";
-  const shareCode = result?.code || rawRefCode || "eef4cb";
+  const code = useMemo(
+    () => rawRefCode || result?.code || "eef4cb",
+    [rawRefCode, result]
+  );
   const shareUrl = result?.referralLink;
   const qrCodeDownloadUrl = result?.qrCodeDownloadUrl;
 
@@ -47,7 +49,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       loading={loading}
       error={error}
       result={result}
-      registrationCode={registrationCode}
+      registrationCode={code}
       hasCompleted={hasCompleted}
       register={register}
       isSubmitting={isSubmitting}
@@ -68,7 +70,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
           /** push to external kickstarter url with ref code attached */
           window.location.href = `https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`;
         }}
-        shareCode={shareCode}
+        shareCode={code}
         shareUrl={shareUrl}
         qrCodeDownloadUrl={qrCodeDownloadUrl}
       />
