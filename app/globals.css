@@ -12,3 +12,18 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
 }
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Applied to the inner track that contains 2 copies of the items */
+.ticker-track {
+  animation: ticker-scroll 25s linear infinite;
+  will-change: transform;
+}

@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
+import {
+  UpdateCodeMetricsRequest,
+  UpdateCodeMetricsResponse,
+} from "../types/update-code-metrics";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { ref } = body;
+    const body: UpdateCodeMetricsRequest = await request.json();
+    const { code, metrics } = body;
 
-    if (!ref || typeof ref !== "string") {
+    if (!code || typeof code !== "string") {
       return NextResponse.json(
-        { error: "Missing or invalid ref parameter" },
+        { success: false, message: "Missing or invalid code parameter" },
+        { status: 400 }
+      );
+    }
+
+    if (!metrics) {
+      return NextResponse.json(
+        { success: false, message: "Missing metrics parameter" },
         { status: 400 }
       );
     }
@@ -17,8 +28,12 @@ export async function POST(request: Request) {
 
     if (!metricsApiUrl) {
       // If no external API configured, just log (for development)
-      console.log(`[Metrics] QR code scanned: ${ref}`);
-      return NextResponse.json({ success: true, logged: true });
+      console.log(`[Metrics] QR code scanned: ${code}`);
+      const response: UpdateCodeMetricsResponse = {
+        success: true,
+        message: "Metrics logged locally",
+      };
+      return NextResponse.json(response);
     }
 
     // Call external metrics API
@@ -32,7 +47,8 @@ export async function POST(request: Request) {
           }),
         },
         body: JSON.stringify({
-          ref,
+          code,
+          metrics,
           timestamp: new Date().toISOString(),
         }),
       });
@@ -45,12 +61,17 @@ export async function POST(request: Request) {
       // Don't throw - we want to return success even if external API fails
     }
 
-    return NextResponse.json({ success: true });
+    const response: UpdateCodeMetricsResponse = {
+      success: true,
+      message: "Metrics updated successfully",
+    };
+    return NextResponse.json(response);
   } catch (error) {
     console.error("[Metrics] Request processing error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const response: UpdateCodeMetricsResponse = {
+      success: false,
+      message: "Internal server error",
+    };
+    return NextResponse.json(response, { status: 500 });
   }
 }
