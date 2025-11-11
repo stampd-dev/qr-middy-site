@@ -3,7 +3,6 @@ frontend:
   phases:
     preBuild:
       commands:
-        - rm -rf node_modules/lightningcss* || true
         - npm ci --include=optional
     build:
       commands:
@@ -11,9 +10,8 @@ frontend:
   artifacts:
     baseDirectory: .next
     files:
-      - '**/*'
+      - "**/*"
   cache:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
-
