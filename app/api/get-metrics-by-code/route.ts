@@ -3,6 +3,7 @@ import {
   GetMetricsByCodeRequest,
   GetMetricsByCodeResponse,
 } from "../types/get-metrics-by-code";
+import { extractClientIP, getIPHeaders } from "../../utils/ip-extraction";
 
 const METRICS_API_URL =
   "https://9zkwe85qj4.execute-api.us-east-1.amazonaws.com/public-metrics/get-metrics-by-code";
@@ -10,7 +11,20 @@ const METRICS_API_URL =
 export async function POST(request: Request) {
   try {
     const body: GetMetricsByCodeRequest = await request.json();
-    const { code } = body;
+    const { code, ip, fingerprint } = body;
+
+    // Extract IP from request if not provided
+    const clientIP = ip || extractClientIP(request);
+    const ipHeaders = getIPHeaders(request);
+
+    // Log all fingerprint and IP data
+    console.log("[GetMetricsByCode] Fingerprint data:", {
+      clientIP,
+      fingerprint,
+      ipHeaders,
+      userAgent: request.headers.get("user-agent"),
+      code,
+    });
 
     if (!code || typeof code !== "string") {
       return NextResponse.json(
@@ -25,7 +39,11 @@ export async function POST(request: Request) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({
+          code,
+          ip: clientIP,
+          fingerprint: fingerprint || "unknown",
+        }),
       });
 
       if (!response.ok) {
@@ -56,6 +74,8 @@ export async function POST(request: Request) {
             coinNumber: "",
             kickstarterUrl: "",
           },
+          qr_code_download_url: "",
+          referral_link: "",
         };
         return NextResponse.json(errorResponse, { status: response.status });
       }
@@ -87,6 +107,8 @@ export async function POST(request: Request) {
           coinNumber: "",
           kickstarterUrl: "",
         },
+        qr_code_download_url: "",
+        referral_link: "",
       };
       return NextResponse.json(errorResponse, { status: 500 });
     }
@@ -115,6 +137,8 @@ export async function POST(request: Request) {
         coinNumber: "",
         kickstarterUrl: "",
       },
+      qr_code_download_url: "",
+      referral_link: "",
     };
     return NextResponse.json(response, { status: 500 });
   }

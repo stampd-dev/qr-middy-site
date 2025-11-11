@@ -3,11 +3,38 @@ import {
   RegisterCodeRequest,
   RegisterCodeResponse,
 } from "../types/register-code";
+import { extractClientIP, getIPHeaders } from "../../utils/ip-extraction";
+
+const REGISTER_API_URL =
+  "https://f9c1eloq82.execute-api.us-east-1.amazonaws.com/admin/register-code";
 
 export async function POST(request: Request) {
   try {
     const body: RegisterCodeRequest = await request.json();
-    const { code, firstName, lastName, email, phone, nickname } = body;
+    const {
+      code,
+      firstName,
+      lastName,
+      email,
+      phone,
+      nickname,
+      ip,
+      fingerprint,
+    } = body;
+
+    // Extract IP from request if not provided
+    const clientIP = ip || extractClientIP(request);
+    const ipHeaders = getIPHeaders(request);
+
+    // Log all fingerprint and IP data
+    console.log("[RegisterCode] Fingerprint data:", {
+      clientIP,
+      fingerprint,
+      ipHeaders,
+      userAgent: request.headers.get("user-agent"),
+      code,
+      email: email?.substring(0, 3) + "***", // Partial email for logging
+    });
 
     if (!code || typeof code !== "string") {
       return NextResponse.json(
@@ -51,13 +78,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Implement actual code registration logic
-    const response: RegisterCodeResponse = {
-      success: true,
-      message: "Code registered successfully",
-    };
+    try {
+      const response = await fetch(REGISTER_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          firstName,
+          lastName,
+          email,
+          phone,
+          nickname,
+          ip: clientIP,
+          fingerprint: fingerprint || "unknown",
+        }),
+      });
 
-    return NextResponse.json(response);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          `[RegisterCode] API error: ${response.status} - ${errorText}`
+        );
+        const errorResponse: RegisterCodeResponse = {
+          success: false,
+          message: `Failed to register code: ${response.status}`,
+        };
+        return NextResponse.json(errorResponse, { status: response.status });
+      }
+
+      const data: RegisterCodeResponse = await response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error("[RegisterCode] Failed to call external API:", error);
+      const errorResponse: RegisterCodeResponse = {
+        success: false,
+        message: "Failed to connect to registration service",
+      };
+      return NextResponse.json(errorResponse, { status: 500 });
+    }
   } catch (error) {
     console.error("[RegisterCode] Request processing error:", error);
     const response: RegisterCodeResponse = {
@@ -67,4 +127,3 @@ export async function POST(request: Request) {
     return NextResponse.json(response, { status: 500 });
   }
 }
-

@@ -1,16 +1,18 @@
 import { RefererStats } from "./referrer-dynamo";
 
-export type GetMetricsByCodeRequest = {
-  code: string;
+export type CreateNewReferrerRequest = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
   ip: string;
   fingerprint: string;
 };
 
-export type GetMetricsByCodeResponse = {
+export type CreateNewReferrerResponse = {
   success: boolean;
   message: string;
-  registered: boolean;
-  record: RefererStats;
+  new_referrer: RefererStats;
   qr_code_download_url: string;
   referral_link: string;
 };
