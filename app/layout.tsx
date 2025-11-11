@@ -1,6 +1,6 @@
 "use client";
 // app/layout.tsx (sketch)
-import { useMemo, type ReactNode } from "react";
+import { Suspense, useMemo, type ReactNode } from "react";
 import "./globals.css";
 import { WaterBackground } from "./components/water/WaterBackground";
 import { useRippleEvents } from "./hooks/use-ripple-event";
@@ -20,7 +20,7 @@ const PlanetBubbleMenu = dynamic(
   }
 );
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+function LayoutContent({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
   const rawRefCode = searchParams.get("ref");
 
@@ -41,43 +41,51 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const qrCodeDownloadUrl = result?.qrCodeDownloadUrl;
 
   return (
+    <RegistrationGate
+      loading={loading}
+      error={error}
+      result={result}
+      hasCompleted={hasCompleted}
+      register={register}
+      isSubmitting={isSubmitting}
+      submitError={submitError}
+    >
+      {/* Full-screen water background */}
+      <WaterBackground
+        events={events}
+        biggestSplashers={biggestSplashers}
+        furthestRipples={furthestRipples}
+      />
+
+      {/* Interactive widgets at root level */}
+      <PlanetBubbleMenu
+        onGetYourOwnCode={() => {}}
+        onShareThisCode={() => {}}
+        onMakeASplash={() => {
+          /** push to external kickstarter url with ref code attached */
+          window.location.href = `https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`;
+        }}
+        shareCode={shareCode}
+        shareUrl={shareUrl}
+        qrCodeDownloadUrl={qrCodeDownloadUrl}
+      />
+      <CentralCallToAction
+        kickstarterUrl={`https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`}
+      />
+
+      {/* Your normal page content, in the same stack */}
+      <div className="relative pointer-events-none">{children}</div>
+    </RegistrationGate>
+  );
+}
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
     <html lang="en">
       <body className="relative min-h-screen bg-slate-950 text-slate-50">
-        <RegistrationGate
-          loading={loading}
-          error={error}
-          result={result}
-          hasCompleted={hasCompleted}
-          register={register}
-          isSubmitting={isSubmitting}
-          submitError={submitError}
-        >
-          {/* Full-screen water background */}
-          <WaterBackground
-            events={events}
-            biggestSplashers={biggestSplashers}
-            furthestRipples={furthestRipples}
-          />
-
-          {/* Interactive widgets at root level */}
-          <PlanetBubbleMenu
-            onGetYourOwnCode={() => {}}
-            onShareThisCode={() => {}}
-            onMakeASplash={() => {
-              /** push to external kickstarter url with ref code attached */
-              window.location.href = `https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`;
-            }}
-            shareCode={shareCode}
-            shareUrl={shareUrl}
-            qrCodeDownloadUrl={qrCodeDownloadUrl}
-          />
-          <CentralCallToAction
-            kickstarterUrl={`https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`}
-          />
-
-          {/* Your normal page content, in the same stack */}
-          <div className="relative pointer-events-none">{children}</div>
-        </RegistrationGate>
+        <Suspense fallback={<div className="relative pointer-events-none">{children}</div>}>
+          <LayoutContent>{children}</LayoutContent>
+        </Suspense>
       </body>
     </html>
   );
