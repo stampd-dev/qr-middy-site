@@ -3,7 +3,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - rm -rf node_modules/lightningcss* || true
+        - npm ci --include=optional
     build:
       commands:
         - npm run build
