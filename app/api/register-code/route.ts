@@ -11,19 +11,11 @@ const REGISTER_API_URL =
 export async function POST(request: Request) {
   try {
     const body: RegisterCodeRequest = await request.json();
-    const {
-      code,
-      firstName,
-      lastName,
-      email,
-      phone,
-      nickname,
-      ip,
-      fingerprint,
-    } = body;
+    const { code, firstName, lastName, email, phone, nickname, fingerprint } =
+      body;
 
     // Extract IP from request if not provided
-    const clientIP = ip || extractClientIP(request);
+    const clientIP = extractClientIP(request);
     const ipHeaders = getIPHeaders(request);
 
     // Log all fingerprint and IP data

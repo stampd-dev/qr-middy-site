@@ -321,7 +321,6 @@ export function useRegisterReferral(): UseRegisterReferralReturn {
           email: payload.email,
           phone: payload.phone,
           nickname,
-          // ip will be extracted server-side from request headers
           fingerprint: fingerprint || "unknown",
         }),
       });
