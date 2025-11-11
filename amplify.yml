@@ -3,7 +3,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci --include=optional
+        - rm -rf node_modules
+        - npm install --include=optional --legacy-peer-deps
     build:
       commands:
         - npm run build
