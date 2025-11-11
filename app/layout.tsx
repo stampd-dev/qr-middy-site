@@ -36,6 +36,8 @@ function LayoutContent({ children }: { children: ReactNode }) {
   const { events, biggestSplashers, furthestRipples } = useRippleEvents();
 
   // Get share data from backend response
+  // Use rawRefCode as source of truth for registration, fallback to result.code only if no URL code
+  const registrationCode = rawRefCode || result?.code || "eef4cb";
   const shareCode = result?.code || rawRefCode || "eef4cb";
   const shareUrl = result?.referralLink;
   const qrCodeDownloadUrl = result?.qrCodeDownloadUrl;
@@ -45,6 +47,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       loading={loading}
       error={error}
       result={result}
+      registrationCode={registrationCode}
       hasCompleted={hasCompleted}
       register={register}
       isSubmitting={isSubmitting}
@@ -83,7 +86,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="relative min-h-screen bg-slate-950 text-slate-50">
-        <Suspense fallback={<div className="relative pointer-events-none">{children}</div>}>
+        <Suspense
+          fallback={
+            <div className="relative pointer-events-none">{children}</div>
+          }
+        >
           <LayoutContent>{children}</LayoutContent>
         </Suspense>
       </body>

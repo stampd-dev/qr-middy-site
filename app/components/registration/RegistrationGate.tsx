@@ -10,6 +10,8 @@ type RegistrationGateProps = {
   loading: boolean;
   error: string | null;
   result: ReferralLookupResult | null;
+  /** The code to use for registration (from URL, not from API fallback) */
+  registrationCode: string;
   hasCompleted: boolean;
   register: (payload: {
     code: string;
@@ -26,6 +28,7 @@ export function RegistrationGate({
   loading,
   error,
   result,
+  registrationCode,
   hasCompleted,
   register,
   isSubmitting,
@@ -53,7 +56,7 @@ export function RegistrationGate({
     );
   }
 
-  const { code, registered, name } = result;
+  const { registered, name } = result;
 
   // If already registered (or we've just completed local registration),
   // skip the registration UI and show the main experience.
@@ -62,6 +65,7 @@ export function RegistrationGate({
   }
 
   // Otherwise, show first-time registration form.
+  // Use registrationCode (from URL) instead of result.code (which might be fallback)
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 text-sky-50">
       <div className="relative max-w-md w-full mx-4 rounded-3xl border border-sky-500/40 bg-slate-900/80 px-7 py-6 shadow-2xl shadow-slate-950/80 backdrop-blur-md">
@@ -75,7 +79,7 @@ export function RegistrationGate({
 
         <p className="mb-4 text-xs text-sky-200/85">
           You&apos;re activating splash code{" "}
-          <span className="font-semibold text-sky-300">{code}</span>
+          <span className="font-semibold text-sky-300">{registrationCode}</span>
           {name && name !== "unassigned" && (
             <>
               {" "}
@@ -86,7 +90,7 @@ export function RegistrationGate({
         </p>
 
         <RegistrationForm
-          code={code}
+          code={registrationCode}
           isSubmitting={isSubmitting}
           submitError={submitError}
           onSubmit={register}
