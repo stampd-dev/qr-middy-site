@@ -45,18 +45,40 @@ async function fetchReferralInfo(
     };
   }
 
-  const response = await fetch("/api/get-metrics-by-code", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      code: codeFromUrl,
-      fingerprint,
-    }),
+  console.log("[fetchReferralInfo] Calling /api/get-metrics-by-code with:", {
+    code: codeFromUrl,
+    fingerprint: fingerprint.substring(0, 8) + "...",
   });
 
+  let response: Response;
+  try {
+    response = await fetch("/api/get-metrics-by-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: codeFromUrl,
+        fingerprint,
+      }),
+    });
+  } catch (networkError) {
+    console.error("[fetchReferralInfo] Network error:", networkError);
+    const error: ErrorWithStatus = new Error(
+      "Network error: Failed to reach API"
+    );
+    error.status = 0; // Network error, not HTTP error
+    throw error;
+  }
+
+  console.log("[fetchReferralInfo] Response status:", response.status);
+
   if (!response.ok) {
+    const errorText = await response.text().catch(() => "Unknown error");
+    console.error("[fetchReferralInfo] API error response:", {
+      status: response.status,
+      body: errorText,
+    });
     const error: ErrorWithStatus = new Error(
       `Failed to fetch referral info: ${response.status}`
     );
@@ -65,6 +87,11 @@ async function fetchReferralInfo(
   }
 
   const data = await response.json();
+  console.log("[fetchReferralInfo] API response data:", {
+    success: data.success,
+    registered: data.registered,
+    hasRecord: !!data.record,
+  });
 
   if (!data.success) {
     const error: ErrorWithStatus = new Error(data.message || "Unknown error");
@@ -116,39 +143,86 @@ export function useReferralLookup(rawCode: string | null): ReferralLookupState {
     let cancelled = false;
 
     async function run() {
-      console.log("Running lookup for code:", rawCode);
+      console.log("[useReferralLookup] Running lookup for code:", rawCode);
       setState({ loading: true, error: null, result: null });
 
       if (!rawCode) {
-        console.log("Fallback to eef4cb");
-        /** Reload page with fallback code */
-        window.location.href = `/?ref=eef4cb`;
+        console.log(
+          "[useReferralLookup] No code in URL, using fallback eef4cb"
+        );
+        setState({
+          loading: false,
+          error: null,
+          result: {
+            code: "eef4cb",
+            registered: false,
+          },
+        });
+        return;
       }
 
       // Wait for fingerprint if not ready
       if (!fingerprint) {
+        console.log("[useReferralLookup] Waiting for fingerprint...");
         return;
       }
 
       try {
+        console.log("[useReferralLookup] Calling API with code:", rawCode);
         const result = await fetchReferralInfo(rawCode, fingerprint);
         if (cancelled) return;
+        console.log("[useReferralLookup] API success:", result);
         setState({ loading: false, error: null, result });
       } catch (err: unknown) {
         if (cancelled) return;
 
         const error = err as ErrorWithStatus;
         const status = error?.status;
-        // Fallback logic: 400/404 or no code → fallback "eef4cb"
-        if (!rawCode || status === 400 || status === 404) {
-          console.log("Fallback to eef4cb");
-          /** Reload page with fallback code */
-          window.location.href = `/?ref=eef4cb`;
+        console.error("[useReferralLookup] API error:", {
+          status,
+          message: error?.message,
+          code: rawCode,
+        });
+
+        // Only fallback to eef4cb if code doesn't exist (404) or is invalid (400)
+        // For other errors (network, 500, etc), show error but don't redirect
+        if (status === 404) {
+          console.log(
+            "[useReferralLookup] Code not found (404), using fallback eef4cb"
+          );
+          setState({
+            loading: false,
+            error: null,
+            result: {
+              code: "eef4cb",
+              registered: false,
+            },
+          });
+        } else if (status === 400) {
+          console.log(
+            "[useReferralLookup] Invalid code (400), using fallback eef4cb"
+          );
+          setState({
+            loading: false,
+            error: null,
+            result: {
+              code: "eef4cb",
+              registered: false,
+            },
+          });
         } else {
+          // For other errors (network issues, 500, etc), show error but keep the code
+          console.error(
+            "[useReferralLookup] Non-fallback error, keeping code:",
+            rawCode
+          );
           setState({
             loading: false,
             error: error?.message ?? "Unknown error",
-            result: null,
+            result: {
+              code: rawCode,
+              registered: false,
+            },
           });
         }
       }
