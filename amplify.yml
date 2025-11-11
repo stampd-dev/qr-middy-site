@@ -4,7 +4,7 @@ frontend:
     preBuild:
       commands:
         - rm -rf node_modules
-        - npm install --include=optional --legacy-peer-deps
+        - npm ci --include=optional
         - npm rebuild lightningcss || true
     build:
       commands:
