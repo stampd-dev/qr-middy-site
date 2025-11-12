@@ -34,7 +34,7 @@ export function LeaderboardPanels({
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-300">
               Biggest Splashers
             </div>
-            <div className="text-[10px] text-sky-200/80">most scans</div>
+            <div className="text-[10px] text-sky-200/80">biggest splash</div>
           </div>
           <div className="space-y-1">
             {biggest.map((item) => (
@@ -43,13 +43,10 @@ export function LeaderboardPanels({
                 className="flex items-center justify-between rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-sky-50/95"
               >
                 <div className="flex items-center gap-2">
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500/30 text-[9px] font-semibold text-sky-100">
-                    {item.rank}
-                  </span>
                   <span className="truncate max-w-[90px]">{item.name}</span>
                 </div>
                 <span className="text-[10px] tabular-nums text-sky-300">
-                  {item.totalScans.toLocaleString()} scans
+                  {item.totalScans.toLocaleString()}
                 </span>
               </div>
             ))}
@@ -64,7 +61,7 @@ export function LeaderboardPanels({
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-300">
               Furthest Ripples
             </div>
-            <div className="text-[10px] text-sky-200/80">longest journeys</div>
+            <div className="text-[10px] text-sky-200/80">longest journey</div>
           </div>
           <div className="space-y-1">
             {furthest.map((item) => (
@@ -73,9 +70,6 @@ export function LeaderboardPanels({
                 className="flex items-center justify-between rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-sky-50/95"
               >
                 <div className="flex items-center gap-2">
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500/30 text-[9px] font-semibold text-sky-100">
-                    {item.rank}
-                  </span>
                   <span className="truncate max-w-[90px]">{item.name}</span>
                 </div>
                 <span className="truncate max-w-[90px] text-[10px] text-sky-300">

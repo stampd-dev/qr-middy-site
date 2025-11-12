@@ -19,87 +19,139 @@ export function useRippleEvents() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchEvents() {
+    async function fetchTopCodes() {
       try {
-        // const res = await fetch("/api/ripples"); // your endpoint
-        // if (!res.ok) return;
-        // const data: RippleEvent[] = await res.json();
-        const data: RippleEvent[] = [
-          {
-            id: "1",
-            lat: 51.5074,
-            lon: -0.1278,
-            location: "London",
-            referrer: "Scott",
-            firstSeenAt: "2025-11-11T12:00:00.000Z",
-            lastSeenAt: "2025-11-11T12:00:00.000Z",
-          },
-          {
-            id: "2",
-            lat: 30.2672,
-            lon: -97.7431,
-            location: "TX",
-            referrer: "Joe",
-            firstSeenAt: "2025-11-11T12:00:00.000Z",
-            lastSeenAt: "2025-11-11T12:00:00.000Z",
-          },
-          {
-            id: "3",
-            lat: 40.7128,
-            lon: -74.006,
-            location: "NY",
-            referrer: "Sean",
-            firstSeenAt: "2025-11-11T12:00:00.000Z",
-            lastSeenAt: "2025-11-11T12:00:00.000Z",
-          },
-          {
-            id: "4",
-            lat: 37.7749,
-            lon: -122.4194,
-            location: "CA",
-            referrer: "Alex",
-            firstSeenAt: "2025-11-11T12:00:00.000Z",
-            lastSeenAt: "2025-11-11T12:00:00.000Z",
-          },
-          {
-            id: "5",
-            lat: 34.0522,
-            lon: -118.2437,
-            location: "CA",
-            referrer: "Chris",
-            firstSeenAt: "2025-11-11T12:00:00.000Z",
-            lastSeenAt: "2025-11-11T12:00:00.000Z",
-          },
-        ];
+        const res = await fetch("/api/get-top-codes");
+        if (!res.ok) {
+          console.error(
+            "[useRippleEvents] Top codes API response not OK:",
+            res.status
+          );
+          return;
+        }
+        const data = await res.json();
 
-        const biggestSplashers = [
-          { name: "Scott", totalScans: 1, rank: 1 },
-          { name: "Joe", totalScans: 1, rank: 2 },
-          { name: "Sean", totalScans: 1, rank: 3 },
-          { name: "Alex", totalScans: 1, rank: 4 },
-          { name: "Chris", totalScans: 1, rank: 5 },
-        ];
+        if (!data.success || cancelled) {
+          if (!data.success) {
+            console.warn(
+              "[useRippleEvents] Top codes API returned success: false",
+              data.message
+            );
+          }
+          return;
+        }
 
-        const furthestRipples = [
-          { name: "Scott", location: "London", rank: 1 },
-          { name: "Joe", location: "TX", rank: 2 },
-          { name: "Sean", location: "NY", rank: 3 },
-          { name: "Alex", location: "CA", rank: 4 },
-          { name: "Chris", location: "CA", rank: 5 },
-        ];
+        const mostArray = Array.isArray(data.most) ? data.most : [];
+        const furthestArray = Array.isArray(data.furthest) ? data.furthest : [];
+
+        const biggestSplashers: BiggestSplasher[] = mostArray.map(
+          (
+            item: { referrer: string; totalUniqueScans: number },
+            index: number
+          ) => ({
+            name: item.referrer || "Unknown",
+            totalScans: item.totalUniqueScans || 0,
+            rank: index + 1,
+          })
+        );
+
+        const furthestRipples: FurthestRipple[] = furthestArray
+          .sort(
+            (
+              a: {
+                referrer: string;
+                location: string;
+                distanceFromOriginal: number;
+              },
+              b: {
+                referrer: string;
+                location: string;
+                distanceFromOriginal: number;
+              }
+            ) => (b.distanceFromOriginal || 0) - (a.distanceFromOriginal || 0)
+          )
+          .map(
+            (
+              item: {
+                referrer: string;
+                location: string;
+                distanceFromOriginal: number;
+              },
+              index: number
+            ) => ({
+              name: item.referrer || "Unknown",
+              location: item.location || "Unknown",
+              rank: index + 1,
+            })
+          );
 
         if (!cancelled) {
-          setEvents(data);
           setBiggestSplashers(biggestSplashers);
           setFurthestRipples(furthestRipples);
         }
-      } catch {
-        // swallow errors or log
+      } catch (error) {
+        console.error("[useRippleEvents] Failed to fetch top codes:", error);
       }
     }
 
-    fetchEvents();
-    const id = setInterval(fetchEvents, POLL_INTERVAL_MS);
+    async function fetchRecentRipples() {
+      try {
+        const res = await fetch("/api/get-recent-ripples");
+        if (!res.ok) {
+          console.error(
+            "[useRippleEvents] Recent ripples API response not OK:",
+            res.status
+          );
+          return;
+        }
+        const data = await res.json();
+
+        if (!data.success || cancelled) {
+          if (!data.success) {
+            console.warn(
+              "[useRippleEvents] Recent ripples API returned success: false",
+              data.message
+            );
+          }
+          return;
+        }
+
+        const ripplesArray = Array.isArray(data.ripples) ? data.ripples : [];
+        const now = new Date().toISOString();
+        const baseTimestamp = Date.now();
+
+        const rippleEvents: RippleEvent[] = ripplesArray.map(
+          (
+            item: { referrer: string; location: string },
+            index: number
+          ): RippleEvent => ({
+            id: `ripple-${baseTimestamp}-${index}-${item.referrer}-${item.location}`,
+            lat: 0, // Placeholder - positions are normalized to fixed slots in geo.ts
+            lon: 0, // Placeholder - positions are normalized to fixed slots in geo.ts
+            location: item.location || "Unknown",
+            referrer: item.referrer || "Unknown",
+            firstSeenAt: now,
+            lastSeenAt: now,
+          })
+        );
+
+        if (!cancelled) {
+          setEvents(rippleEvents);
+        }
+      } catch (error) {
+        console.error(
+          "[useRippleEvents] Failed to fetch recent ripples:",
+          error
+        );
+      }
+    }
+
+    async function fetchAll() {
+      await Promise.all([fetchTopCodes(), fetchRecentRipples()]);
+    }
+
+    fetchAll();
+    const id = setInterval(fetchAll, POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;

@@ -135,6 +135,7 @@ function RegistrationForm({
   isSubmitting,
   submitError,
   onSubmit,
+  code,
 }: RegistrationFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -173,7 +174,12 @@ function RegistrationForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await onSubmit({ code, name, email, phone: unformatPhoneNumber(phone) });
+    await onSubmit({
+      code,
+      name,
+      email,
+      phone: unformatPhoneNumber(phone),
+    });
   };
 
   return (
