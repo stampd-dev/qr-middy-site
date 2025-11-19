@@ -184,7 +184,6 @@ export function PlanetBubbleMenu({
       {newReferrerModalOpen && (
         <NewReferrerModal
           isOpen={newReferrerModalOpen}
-          onClose={() => setNewReferrerModalOpen(false)}
           onSuccess={handleNewReferrerSuccess}
           onContinueWithoutCode={handleContinueWithoutCode}
         />
@@ -229,14 +228,12 @@ function BubbleItem({ label, icon, onClick }: BubbleItemProps) {
 
 type NewReferrerModalProps = {
   isOpen: boolean;
-  onClose: () => void;
   onSuccess: (response: CreateNewReferrerResponse) => void;
   onContinueWithoutCode: () => void;
 };
 
 function NewReferrerModal({
   isOpen,
-  onClose,
   onSuccess,
   onContinueWithoutCode,
 }: NewReferrerModalProps) {
@@ -247,7 +244,7 @@ function NewReferrerModal({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
-        onClick={onClose}
+        onClick={onContinueWithoutCode}
       />
 
       {/* Modal */}
@@ -269,7 +266,7 @@ function NewReferrerModal({
           {/* Close button */}
           <button
             type="button"
-            onClick={onClose}
+            onClick={onContinueWithoutCode}
             className="
               absolute top-4 right-4
               w-8 h-8
