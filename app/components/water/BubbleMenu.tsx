@@ -15,6 +15,7 @@ type PlanetBubbleMenuProps = {
   shareCode?: string;
   shareUrl?: string;
   qrCodeDownloadUrl?: string;
+  hasRefCode?: boolean; // Whether there's a ref code in the URL
 };
 
 export function PlanetBubbleMenu({
@@ -25,6 +26,7 @@ export function PlanetBubbleMenu({
   shareCode,
   shareUrl,
   qrCodeDownloadUrl,
+  hasRefCode = true,
 }: PlanetBubbleMenuProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -54,6 +56,16 @@ export function PlanetBubbleMenu({
       }
     }
   }, []);
+
+  // Auto-open new referrer form if no ref code
+  useEffect(() => {
+    if (!hasRefCode && !newReferrerModalOpen) {
+      // Small delay to ensure component is mounted
+      setTimeout(() => {
+        setNewReferrerModalOpen(true);
+      }, 100);
+    }
+  }, [hasRefCode, newReferrerModalOpen]);
 
   const handleShareClick = () => {
     setOpen(false);
@@ -90,6 +102,13 @@ export function PlanetBubbleMenu({
     // Open share modal with new data
     setNewReferrerData(shareData);
     setShareModalOpen(true);
+  };
+
+  const handleContinueWithoutCode = () => {
+    // Close the new referrer modal
+    setNewReferrerModalOpen(false);
+    // Navigate to default code
+    router.push("/?ref=eef4cb");
   };
 
   return (
@@ -167,6 +186,7 @@ export function PlanetBubbleMenu({
           isOpen={newReferrerModalOpen}
           onClose={() => setNewReferrerModalOpen(false)}
           onSuccess={handleNewReferrerSuccess}
+          onContinueWithoutCode={handleContinueWithoutCode}
         />
       )}
     </div>
@@ -211,12 +231,14 @@ type NewReferrerModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (response: CreateNewReferrerResponse) => void;
+  onContinueWithoutCode: () => void;
 };
 
 function NewReferrerModal({
   isOpen,
   onClose,
   onSuccess,
+  onContinueWithoutCode,
 }: NewReferrerModalProps) {
   if (!isOpen) return null;
 
@@ -275,7 +297,10 @@ function NewReferrerModal({
               </p>
             </div>
 
-            <NewReferrerForm onSuccess={onSuccess} />
+            <NewReferrerForm
+              onSuccess={onSuccess}
+              onContinueWithoutCode={onContinueWithoutCode}
+            />
           </div>
         </div>
       </div>

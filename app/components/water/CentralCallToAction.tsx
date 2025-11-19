@@ -21,8 +21,8 @@ export function CentralCallToAction({
         Make a Splash
       </div>
 
-      <h2 className="text-lg sm:text-2xl font-semibold leading-tight mb-2 text-sky-50">
-        Help ripples become waves.
+      <h2 className="text-md sm:text-2xl font-semibold leading-tight mb-2 text-sky-50">
+        Turn your ripple into waves
       </h2>
 
       <motion.a

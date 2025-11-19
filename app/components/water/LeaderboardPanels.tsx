@@ -32,9 +32,9 @@ export function LeaderboardPanels({
         <div className="max-w-xs rounded-2xl border border-sky-500/30 bg-slate-950/75 px-3 py-2 shadow-xl shadow-sky-900/40 backdrop-blur">
           <div className="mb-1 flex items-center justify-between">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-300">
-              Biggest Splashers
+              Biggest Splash
             </div>
-            <div className="text-[10px] text-sky-200/80">biggest splash</div>
+            <div className="text-[10px] text-sky-200/80">total scans</div>
           </div>
           <div className="space-y-1">
             {biggest.map((item) => (
@@ -59,7 +59,7 @@ export function LeaderboardPanels({
         <div className="max-w-xs rounded-2xl border border-blue-500/30 bg-slate-950/75 px-3 py-2 shadow-xl shadow-blue-900/40 backdrop-blur ml-4">
           <div className="mb-1 flex items-center justify-between">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-300">
-              Furthest Ripples
+              Furthest Ripple
             </div>
             <div className="text-[10px] text-sky-200/80">longest journey</div>
           </div>

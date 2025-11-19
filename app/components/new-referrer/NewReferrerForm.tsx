@@ -6,6 +6,7 @@ import { CreateNewReferrerResponse } from "../../api/types/create-new-referrer";
 
 type NewReferrerFormProps = {
   onSuccess?: (response: CreateNewReferrerResponse) => void;
+  onContinueWithoutCode?: () => void;
 };
 
 /**
@@ -27,7 +28,10 @@ function unformatPhoneNumber(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-export function NewReferrerForm({ onSuccess }: NewReferrerFormProps) {
+export function NewReferrerForm({
+  onSuccess,
+  onContinueWithoutCode,
+}: NewReferrerFormProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -250,6 +254,17 @@ export function NewReferrerForm({ onSuccess }: NewReferrerFormProps) {
         >
           {isSubmitting ? "Adding referrer…" : "Add New Referrer"}
         </button>
+
+        {onContinueWithoutCode && (
+          <button
+            type="button"
+            onClick={onContinueWithoutCode}
+            disabled={isSubmitting}
+            className="mt-2 inline-flex w-full items-center justify-center rounded-full border border-slate-600 bg-slate-800/50 px-4 py-2 text-[12px] font-semibold text-sky-200 shadow-lg transition hover:bg-slate-700/50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Continue without getting a code
+          </button>
+        )}
       </form>
     </div>
   );

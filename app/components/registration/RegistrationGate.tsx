@@ -12,6 +12,8 @@ type RegistrationGateProps = {
   result: ReferralLookupResult | null;
   /** The code to use for registration (from URL, not from API fallback) */
   registrationCode: string;
+  /** Whether there's an actual ref code in the URL (not a fallback) */
+  hasRefCode: boolean;
   hasCompleted: boolean;
   register: (payload: {
     code: string;
@@ -29,6 +31,7 @@ export function RegistrationGate({
   error,
   result,
   registrationCode,
+  hasRefCode,
   hasCompleted,
   register,
   isSubmitting,
@@ -57,6 +60,12 @@ export function RegistrationGate({
   }
 
   const { registered, name } = result;
+
+  // If no ref code in URL, skip registration gate and show children
+  // (This allows the new referrer form to show via BubbleMenu)
+  if (!hasRefCode) {
+    return <>{children}</>;
+  }
 
   // If already registered (or we've just completed local registration),
   // skip the registration UI and show the main experience.

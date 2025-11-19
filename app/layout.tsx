@@ -50,6 +50,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       error={error}
       result={result}
       registrationCode={code}
+      hasRefCode={!!rawRefCode}
       hasCompleted={hasCompleted}
       register={register}
       isSubmitting={isSubmitting}
@@ -73,6 +74,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
         shareCode={code}
         shareUrl={shareUrl}
         qrCodeDownloadUrl={qrCodeDownloadUrl}
+        hasRefCode={!!rawRefCode}
       />
       <CentralCallToAction
         kickstarterUrl={`https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`}
