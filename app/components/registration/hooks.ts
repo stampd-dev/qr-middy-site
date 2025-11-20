@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { createFingerprint } from "../../utils/fingerprint";
 
+import { RefererStats } from "../../api/types/referrer-dynamo";
+
 export type ReferralLookupResult = {
   /** The code we ended up using (may be the fallback "eef4cb") */
   code: string;
@@ -15,6 +17,8 @@ export type ReferralLookupResult = {
   referralLink?: string;
   /** QR code download URL from S3 */
   qrCodeDownloadUrl?: string;
+  /** Full record data from API, only present when registered */
+  record?: RefererStats;
 };
 
 type ErrorWithStatus = Error & {
@@ -112,6 +116,7 @@ async function fetchReferralInfo(
     name,
     referralLink: referral_link,
     qrCodeDownloadUrl: qr_code_download_url,
+    record: registered ? record : undefined,
   };
 }
 

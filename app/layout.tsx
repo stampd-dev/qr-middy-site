@@ -12,6 +12,7 @@ import {
 } from "./components/registration/hooks";
 import dynamic from "next/dynamic";
 import { CentralCallToAction } from "./components/water/CentralCallToAction";
+import { OwnerBanner } from "./components/water/OwnerBanner";
 
 const PlanetBubbleMenu = dynamic(
   () => import("./components/water/BubbleMenu").then((m) => m.PlanetBubbleMenu),
@@ -64,6 +65,10 @@ function LayoutContent({ children }: { children: ReactNode }) {
       />
 
       {/* Interactive widgets at root level */}
+      <OwnerBanner
+        record={result?.record}
+        registered={result?.registered || false}
+      />
       <PlanetBubbleMenu
         onGetYourOwnCode={() => {}}
         onShareThisCode={() => {}}
