@@ -34,7 +34,7 @@ export function LeaderboardPanels({
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-300">
               Biggest Splash
             </div>
-            <div className="text-[10px] text-sky-200/80">total scans</div>
+            <div className="text-[10px] text-sky-200/80">unique scans</div>
           </div>
           <div className="space-y-1">
             {biggest.map((item) => (
