@@ -23,6 +23,8 @@ type RegistrationGateProps = {
   }) => Promise<void>;
   isSubmitting: boolean;
   submitError: string | null;
+  /** Whether video is currently showing (allows content to render behind video) */
+  showVideo?: boolean;
 };
 
 export function RegistrationGate({
@@ -36,9 +38,11 @@ export function RegistrationGate({
   register,
   isSubmitting,
   submitError,
+  showVideo = false,
 }: RegistrationGateProps) {
-  // While we're looking up the code, just show a subtle loading state
-  if (loading) {
+  // While we're looking up the code, show loading state UNLESS video is playing
+  // (video overlay will handle the initial view, so we can render children in background)
+  if (loading && !showVideo) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-sky-100">
         <div className="rounded-2xl bg-slate-900/80 px-6 py-4 text-sm text-sky-200 shadow-lg shadow-slate-900">
