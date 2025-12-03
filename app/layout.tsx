@@ -29,14 +29,21 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
   // Initialize video state - show video on first visit
   // For testing: clear sessionStorage to see video again
-  const [videoComplete, setVideoComplete] = useState(() => {
+  // Initialize to false to avoid hydration mismatch, then check sessionStorage on client
+  const [videoComplete, setVideoComplete] = useState(false);
+
+  // Check sessionStorage after mount to avoid hydration mismatch
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      // Check if video has been seen this session
       const hasSeenVideo = sessionStorage.getItem("hasSeenVideo");
-      return hasSeenVideo === "true";
+      if (hasSeenVideo === "true") {
+        // Use setTimeout to defer state update and avoid hydration mismatch
+        setTimeout(() => {
+          setVideoComplete(true);
+        }, 0);
+      }
     }
-    return false;
-  });
+  }, []);
 
   const { loading, error, result } = useReferralLookup(rawRefCode);
   const {

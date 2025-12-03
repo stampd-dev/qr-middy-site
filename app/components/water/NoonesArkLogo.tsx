@@ -29,11 +29,11 @@ export function NoonesArkLogo() {
       {/* Animated Learn More indicator */}
       {showIndicator && (
         <div className="absolute top-full right-0 mt-3 z-[101] pointer-events-none">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/95 border border-sky-500/30 shadow-lg backdrop-blur-sm animate-pulse">
-            <span className="text-[10px] sm:text-xs text-sky-300 font-medium whitespace-nowrap">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full animate-pulse">
+            <span className="text-[10px] sm:text-xs text-white font-medium whitespace-nowrap">
               Board The Ark
             </span>
-            <span className="text-sm sm:text-base text-sky-400 animate-bounce">
+            <span className="text-sm sm:text-base text-white animate-bounce">
               ↑
             </span>
           </div>
