@@ -79,51 +79,51 @@ export function OwnerBanner({
 
   return (
     <div
-      className={`rounded-lg border border-sky-500/30 bg-slate-950/75 px-2.5 py-1.5 shadow-lg shadow-sky-900/40 backdrop-blur ${className}`}
+      className={`rounded-lg border border-sky-500/30 bg-slate-950/75 px-3 py-2 shadow-lg shadow-sky-900/40 backdrop-blur ${className}`}
     >
-      <div className="flex items-center gap-x-2.5 text-[10px] sm:text-[11px] flex-wrap">
-        {/* Owner Name */}
-        <span className="font-semibold text-sky-50/95 truncate max-w-[120px] sm:max-w-[150px]">
-          {`Ripples by ${ownerName}`}
-        </span>
-
-        <div className="w-px h-3 bg-sky-500/30" />
-
-        {/* Total Scans */}
-        <div className="flex items-center gap-1">
-          <span className="text-sky-200/70">Total:</span>
-          <span className="font-semibold tabular-nums text-sky-300">
-            {totalScans.toLocaleString()}
+      <div className="flex flex-col gap-1.5 text-[10px] sm:text-[11px]">
+        {/* First Row: Owner Name + Total Scans */}
+        <div className="flex items-center justify-center gap-x-2.5">
+          <span className="font-semibold text-sky-50/95">
+            {`Ripples by ${ownerName}`}
           </span>
+          <div className="w-px h-3 bg-sky-500/30" />
+          <div className="flex items-center gap-1">
+            <span className="text-sky-200/70">Total:</span>
+            <span className="font-semibold tabular-nums text-sky-300">
+              {totalScans.toLocaleString()}
+            </span>
+          </div>
         </div>
 
-        <div className="w-px h-3 bg-sky-500/30" />
+        {/* Second Row: Unique + Furthest */}
+        <div className="flex items-center justify-center gap-x-2.5">
+          {/* Unique Scans */}
+          <div className="flex items-center gap-1">
+            <span className="text-sky-200/70">Unique:</span>
+            <span className="font-semibold tabular-nums text-sky-300">
+              {uniqueScans.toLocaleString()}
+            </span>
+          </div>
 
-        {/* Unique Scans */}
-        <div className="flex items-center gap-1">
-          <span className="text-sky-200/70">Unique:</span>
-          <span className="font-semibold tabular-nums text-sky-300">
-            {uniqueScans.toLocaleString()}
-          </span>
-        </div>
-
-        {/* Furthest Scan */}
-        {furthestDistance && (
-          <>
-            <div className="w-px h-3 bg-sky-500/30" />
-            <div className="flex items-center gap-1">
-              <span className="text-sky-200/70">Furthest:</span>
-              <span className="font-semibold tabular-nums text-sky-300">
-                {furthestDistance.distance.toFixed(0)} km
-              </span>
-              {furthestDistance.location?.city && (
-                <span className="text-sky-400/60 text-[9px] truncate max-w-[60px] sm:max-w-[80px]">
-                  ({furthestDistance.location.city})
+          {/* Furthest Scan */}
+          {furthestDistance && (
+            <>
+              <div className="w-px h-3 bg-sky-500/30" />
+              <div className="flex items-center gap-1">
+                <span className="text-sky-200/70">Furthest:</span>
+                <span className="font-semibold tabular-nums text-sky-300">
+                  {furthestDistance.distance.toFixed(0)} km
                 </span>
-              )}
-            </div>
-          </>
-        )}
+                {furthestDistance.location?.city && (
+                  <span className="text-sky-400/60 text-[9px] truncate max-w-[70px] sm:max-w-[90px]">
+                    ({furthestDistance.location.city})
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

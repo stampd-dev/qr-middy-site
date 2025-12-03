@@ -13,6 +13,15 @@ import {
 import { CentralCallToAction } from "./components/water/CentralCallToAction";
 import { TopNavigationBar } from "./components/water/TopNavigationBar";
 import { VideoOverlay } from "./components/water/VideoOverlay";
+import { NoonesArkLogo } from "./components/water/NoonesArkLogo";
+import dynamic from "next/dynamic";
+
+const PlanetBubbleMenu = dynamic(
+  () => import("./components/water/BubbleMenu").then((m) => m.PlanetBubbleMenu),
+  {
+    ssr: false,
+  }
+);
 
 function LayoutContent({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
@@ -116,16 +125,19 @@ function LayoutContent({ children }: { children: ReactNode }) {
         />
 
         {/* Interactive widgets at root level */}
-        <TopNavigationBar
+        <PlanetBubbleMenu
+          onGetYourOwnCode={() => {}}
+          onShareThisCode={() => {}}
           shareCode={code}
           shareUrl={shareUrl}
           qrCodeDownloadUrl={qrCodeDownloadUrl}
           hasRefCode={!!rawRefCode}
+        />
+        <TopNavigationBar
           record={result?.record}
           registered={result?.registered || false}
-          onGetYourOwnCode={() => {}}
-          onShareThisCode={() => {}}
         />
+        <NoonesArkLogo />
         <CentralCallToAction
           kickstarterUrl={`https://www.kickstarter.com/projects/noonesark/no-ones-ark-the-most-biblical-campaign-ever?ref=${rawRefCode}`}
         />

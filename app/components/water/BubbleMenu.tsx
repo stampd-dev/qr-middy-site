@@ -161,7 +161,6 @@ export function PlanetBubbleMenu({
           icon="🔗"
           onClick={handleShareClick}
         />
-        <BubbleItem label="Learn More!" icon="💦" onClick={onMakeASplash} />
       </div>
 
       {/* Share Modal */}
