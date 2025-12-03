@@ -18,7 +18,7 @@ export function NoonesArkLogo() {
         onClick={() => setShowIndicator(false)}
       >
         <Image
-          src={encodeURI("/logos/No Ones Ark - Logo.png")}
+          src="/logos/No Ones Ark - Logo.png"
           alt="No One's Ark"
           className="h-full w-full object-contain rounded-full"
           width={44}
